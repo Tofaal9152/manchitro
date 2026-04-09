@@ -1,6 +1,6 @@
 {
   "name": "manchitro",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "description": "Interactive Bangladesh district SVG map for React, Next.js and TanStack.",
   "main": "dist/index.js",
