@@ -1,4 +1,4 @@
-﻿# React BD District Map
+﻿# React Bangladesh District Map
 
 A highly customizable, interactive, and accessible SVG map of Bangladesh districts for React applications. Built with flexibility in mind, allowing developers to easily integrate, style, and extend its functionality.
 
