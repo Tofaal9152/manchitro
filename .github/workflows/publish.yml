@@ -1,0 +1,33 @@
+name: Publish to npm
+
+on:
+  push:
+    branches:
+      - main # আপনার মেইন ব্রাঞ্চের নাম যদি master হয়, তাহলে master দিবেন
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # npm provenance / OIDC এর জন্য এটি বাধ্যতামূলক
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      # যদি আপনার প্রজেক্টে বিল্ড করার প্রয়োজন থাকে, তাহলে নিচের লাইন আনকমেন্ট করুন
+      # - name: Build Project
+      #   run: npm run build
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public
