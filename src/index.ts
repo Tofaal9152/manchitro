@@ -1,1 +1,1 @@
-export * from "./components/BDMapGallery";
+export * from "./components/Manchitro";
