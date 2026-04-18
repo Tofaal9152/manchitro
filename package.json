@@ -1,22 +1,21 @@
 {
   "name": "manchitro",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "description": "Interactive Bangladesh district SVG map for React, Next.js and TanStack.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-
   "files": [
     "dist"
   ],
-
   "scripts": {
     "build": "rollup -c",
     "prepublishOnly": "npm run build"
   },
-
   "keywords": [
     "bangladesh",
+    "district-map",
+    "bangladesh-district-map",
     "map",
     "district-map",
     "react-map",
@@ -29,21 +28,16 @@
     "css-map",
     "tailwind-map"
   ],
-
   "author": "MD TOFAAL AHMED (https://github.com/tofaal9152)",
-
   "repository": {
     "type": "git",
     "url": "https://github.com/tofaal9152/manchitro"
   },
-
   "license": "MIT",
-
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18"
   },
-
   "devDependencies": {
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-typescript": "^11.1.6",
