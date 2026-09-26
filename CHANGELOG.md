@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1
+
+- Added a link to the live demo (https://tofaal9152.github.io/manchitro-demo/) in the README, the npm homepage link and `llms.txt`.
+
 ## 2.1.0
 
 ### Fixed

@@ -1,6 +1,6 @@
 {
   "name": "manchitro",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Interactive, typed SVG map of all 64 Bangladesh districts as a React component. Highlight districts, handle clicks and hovers, and customize colors. Works with Next.js (App Router), Vite, Remix and TanStack Start.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -50,7 +50,7 @@
     "tailwind-map"
   ],
   "author": "MD TOFAAL AHMED (https://github.com/tofaal9152)",
-  "homepage": "https://github.com/tofaal9152/manchitro#readme",
+  "homepage": "https://tofaal9152.github.io/manchitro-demo/",
   "bugs": {
     "url": "https://github.com/tofaal9152/manchitro/issues"
   },

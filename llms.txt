@@ -45,6 +45,8 @@ export function DistrictPicker() {
 }
 ```
 
-## Full docs
+## Links
 
-https://github.com/tofaal9152/manchitro#readme
+- Live demo: https://tofaal9152.github.io/manchitro-demo/
+- Demo source (Vite + React example app): https://github.com/Tofaal9152/manchitro-demo
+- Full docs: https://github.com/tofaal9152/manchitro#readme

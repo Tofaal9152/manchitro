@@ -4,14 +4,22 @@ An interactive, accessible and fully typed SVG map of all **64 districts of Bang
 
 Works with **Next.js (App Router and Pages Router)**, **Vite**, **Remix / React Router**, **TanStack Start** and plain React 18 or 19. No runtime dependencies.
 
+<p align="center">
+  <a href="https://tofaal9152.github.io/manchitro-demo/"><strong>▶ Try the live demo</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/Tofaal9152/manchitro-demo">Demo source</a>
+  &nbsp;·&nbsp;
+  <a href="https://www.npmjs.com/package/manchitro">npm</a>
+</p>
+
 <div align="center">
   <table>
     <tr>
       <td>
-        <img src="https://i.ibb.co.com/v4KtY2vq/photo-1-2026-04-18-12-48-43.jpg" alt="Manchitro dark map with highlighted districts" width="400" />
+        <a href="https://tofaal9152.github.io/manchitro-demo/"><img src="https://i.ibb.co.com/v4KtY2vq/photo-1-2026-04-18-12-48-43.jpg" alt="Manchitro dark map with highlighted districts" width="400" /></a>
       </td>
       <td>
-        <img src="https://i.ibb.co.com/MDSYzq1H/photo-2-2026-04-18-12-48-43.jpg" alt="Manchitro map with a selected district" width="400" />
+        <a href="https://tofaal9152.github.io/manchitro-demo/"><img src="https://i.ibb.co.com/MDSYzq1H/photo-2-2026-04-18-12-48-43.jpg" alt="Manchitro map with a selected district" width="400" /></a>
       </td>
     </tr>
   </table>
