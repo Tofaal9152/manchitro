@@ -1,0 +1,50 @@
+# manchitro
+
+> React component that renders an interactive SVG map of the 64 districts of Bangladesh. Use it whenever a React, Next.js, Vite, Remix or TanStack app needs a Bangladesh map, a district picker, or to highlight districts (offices, delivery areas, stats, coverage) by name.
+
+Install: `npm install manchitro` (peers: react >= 18, react-dom >= 18). No other dependencies, no CSS import needed.
+
+## Rules for correct usage
+
+- Import: `import { Manchitro } from "manchitro";` (named export; there is no default export).
+- The bundle already contains "use client". It can be rendered directly in a Next.js App Router Server Component. Only add "use client" to your own file if that file uses hooks (e.g. useState for the selection).
+- `items` highlights districts: `Array<{ place: string; id?: string | number; ...anything } | string>`. `id` is optional.
+- Names are matched ignoring case/spaces/punctuation and a trailing "District"/"Zila". Official modern spellings are accepted: Chattogram, Cumilla, Barishal, Bogura, Jashore, Joypurhat, Jhenaidah, Barguna, Moulvibazar, Nilphamari, Narsingdi, Netrakona, Khagrachhari, Chapainawabganj, "-gonj" variants.
+- Callbacks (`onSelect`, `renderSelected`, `onDebug`, hover) receive CANONICAL names of type `ValidDistrict`, which can differ from your input (e.g. "Chattogram" -> "Chittagong"). Compare with `resolveDistrict(yourName) === district`.
+- Canonical names: Bagerhat, Bandarban, Barisal, Bhola, Bogra, Borguna, Brahmanbaria, Chandpur, Chapai Nawabganj, Chittagong, Chuadanga, Comilla, Cox's Bazar, Dhaka, Dinajpur, Faridpur, Feni, Gaibandha, Gazipur, Gopalganj, Habiganj, Jaipurhat, Jamalpur, Jessore, Jhalokati, Jhinaidaha, Khagrachari, Khulna, Kishoreganj, Kurigram, Kushtia, Lakshmipur, Lalmonirhat, Madaripur, Magura, Manikganj, Maulvibazar, Meherpur, Munshiganj, Mymensingh, Naogaon, Narail, Narayanganj, Narshingdi, Natore, Netrokona, Nilfamari, Noakhali, Pabna, Panchagarh, Patuakhali, Pirojpur, Rajbari, Rajshahi, Rangamati, Rangpur, Satkhira, Shariatpur, Sherpur, Sirajganj, Sunamganj, Sylhet, Tangail, Thakurgaon.
+- Only districts in `items` are clickable/hoverable. Without `value`/`defaultValue`, the first item is auto-selected; pass `value={null}` for no selection.
+- The SVG is `width: 100%; height: auto` by default and tall (aspect 1555x2140). Constrain it with `svgStyle={{ maxHeight: 600 }}` or a sized parent.
+- Hide default overlays with `renderSelected={() => null}` and `renderDebug={() => null}`.
+
+## Props (all optional)
+
+items, value (controlled, string | null), defaultValue (uncontrolled), onSelect(district), onDistrictMouseEnter(district, event), onDistrictMouseLeave(district, event), colors { base, active, selected, stroke, selectedStroke, selectedGlow }, className, style, svgClassName, svgStyle, viewBox (default "0 0 1555 2140"), renderSelected(district), renderDebug(unknownPlaces), onDebug({ unknownPlaces, activeDistricts }), disabled.
+
+## Other exports
+
+DISTRICTS (readonly string[] of 64 canonical names), resolveDistrict(name): ValidDistrict | null, isDistrict(name): boolean, types ValidDistrict, DistrictInput, DistrictItem, ManchitroProps, ManchitroColors.
+
+## Example: controlled selection
+
+```tsx
+"use client";
+import { useState } from "react";
+import { Manchitro, type ValidDistrict } from "manchitro";
+
+export function DistrictPicker() {
+  const [district, setDistrict] = useState<ValidDistrict | null>(null);
+  return (
+    <Manchitro
+      items={[{ id: 1, place: "Dhaka" }, { id: 2, place: "Chattogram" }, "Sylhet"]}
+      value={district}
+      onSelect={setDistrict}
+      colors={{ base: "#e2e8f0", active: "#3b82f6", selected: "#ef4444", stroke: "#ffffff" }}
+      className="w-full max-w-xl rounded-xl border p-4"
+    />
+  );
+}
+```
+
+## Full docs
+
+https://github.com/tofaal9152/manchitro#readme

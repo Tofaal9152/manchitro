@@ -1,146 +1,123 @@
 import * as React from "react";
 import { DISTRICT_PATH } from "../data/districtPaths.data";
-/** Complete list of all 64 districts in Bangladesh */
-export type ValidDistrict =
-  | "Rajshahi"
-  | "Nilfamari"
-  | "Panchagarh"
-  | "Thakurgaon"
-  | "Lalmonirhat"
-  | "Dinajpur"
-  | "Rangpur"
-  | "Kurigram"
-  | "Gaibandha"
-  | "Naogaon"
-  | "Jaipurhat"
-  | "Chapai Nawabganj"
-  | "Bogra"
-  | "Natore"
-  | "Sirajganj"
-  | "Kushtia"
-  | "Meherpur"
-  | "Chuadanga"
-  | "Magura"
-  | "Jessore"
-  | "Narail"
-  | "Khulna"
-  | "Pirojpur"
-  | "Bagerhat"
-  | "Sherpur"
-  | "Tangail"
-  | "Manikganj"
-  | "Dhaka"
-  | "Noakhali"
-  | "Lakshmipur"
-  | "Kishoreganj"
-  | "Jamalpur"
-  | "Mymensingh"
-  | "Gazipur"
-  | "Netrokona"
-  | "Sunamganj"
-  | "Sylhet"
-  | "Habiganj"
-  | "Maulvibazar"
-  | "Narshingdi"
-  | "Narayanganj"
-  | "Brahmanbaria"
-  | "Comilla"
-  | "Chandpur"
-  | "Madaripur"
-  | "Faridpur"
-  | "Jhalokati"
-  | "Barisal"
-  | "Borguna"
-  | "Patuakhali"
-  | "Bhola"
-  | "Shariatpur"
-  | "Chittagong"
-  | "Khagrachari"
-  | "Bandarban"
-  | "Rangamati"
-  | "Cox's Bazar"
-  | "Pabna"
-  | "Munshiganj"
-  | "Gopalganj"
-  | "Satkhira"
-  | "Jhinaidaha"
-  | "Rajbari"
-  | "Feni";
+import {
+  resolveDistrict,
+  type DistrictInput,
+  type ValidDistrict,
+} from "../districts";
 
+/** A district to highlight. Extra fields (counts, labels, ...) are allowed and ignored. */
 export type DistrictItem = {
-  id: string;
-  /** * District name.
-   * Uses a TypeScript trick to provide auto-complete for 64 districts while still allowing any string.
-   */
-  place: ValidDistrict | (string & {}); // Updated this line
+  /** Optional identifier for your own bookkeeping. Not used by the map. */
+  id?: string | number;
+  /** District name. Case, spaces and punctuation are ignored; common alternate spellings are accepted. */
+  place: DistrictInput;
+  [key: string]: unknown;
+};
+
+/** Map colors. Any CSS color value works. */
+export type ManchitroColors = {
+  /** Fill for districts that are not in `items`. Default `"#0f172a"`. */
+  base?: string;
+  /** Fill for districts in `items`. Default `"#14532d"`. */
+  active?: string;
+  /** Fill for the selected district. Default `"#22c55e"`. */
+  selected?: string;
+  /** Border color of districts. Default `"#334155"`. */
+  stroke?: string;
+  /** Border color of the selected district. Default `"#ffffff"`. */
+  selectedStroke?: string;
+  /** Glow around the selected district. Defaults to a translucent `selected` color. */
+  selectedGlow?: string;
 };
 
 export type ManchitroProps = {
-  /** Array of districts to highlight on the map */
-  items: DistrictItem[];
+  /**
+   * Districts to highlight and make clickable. Pass objects with a `place`
+   * field or plain district names.
+   * @example items={[{ id: 1, place: "Dhaka" }, "Chattogram"]}
+   */
+  items?: ReadonlyArray<DistrictItem | DistrictInput>;
 
-  /** Selected district (Controlled mode) */
-  value?: string | null;
+  /** Selected district (controlled mode). Pass `null` for no selection. */
+  value?: DistrictInput | null;
 
-  /** Default selected district (Uncontrolled mode) */
-  defaultValue?: string | null;
+  /**
+   * Initially selected district (uncontrolled mode). If omitted or not in
+   * `items`, the first district in `items` is selected.
+   */
+  defaultValue?: DistrictInput | null;
 
-  /** Custom SVG viewBox dimensions */
+  /** SVG viewBox, for cropping or zooming. Default `"0 0 1555 2140"`. */
   viewBox?: string;
 
-  /** Callback fired when an active district is clicked */
-  onSelect?: (districtName: string) => void;
+  /** Called with the canonical district name when a highlighted district is clicked or activated with Enter/Space. */
+  onSelect?: (district: ValidDistrict) => void;
 
-  /** Callback fired when the mouse enters an active district */
-  onDistrictMouseEnter?: (districtName: string, e: React.MouseEvent) => void;
+  /** Called when the pointer enters a highlighted district. */
+  onDistrictMouseEnter?: (
+    district: ValidDistrict,
+    e: React.MouseEvent<SVGGElement>,
+  ) => void;
 
-  /** Callback fired when the mouse leaves an active district */
-  onDistrictMouseLeave?: (districtName: string, e: React.MouseEvent) => void;
+  /** Called when the pointer leaves a highlighted district. */
+  onDistrictMouseLeave?: (
+    district: ValidDistrict,
+    e: React.MouseEvent<SVGGElement>,
+  ) => void;
 
-  /** Tailwind or custom CSS classes for the map container */
+  /** Class names for the container `<div>`. When set, the default container background and border are not applied. */
   className?: string;
 
-  /** Standard React inline styles for the map container */
+  /** Inline styles for the container `<div>`. */
   style?: React.CSSProperties;
 
-  /** Custom CSS classes for the SVG element */
+  /** Class names for the `<svg>`. When set, the default SVG sizing (`width: 100%; height: auto`) is not applied. */
   svgClassName?: string;
 
-  /** Custom map colors */
-  colors?: {
-    base?: string; // Color for inactive districts
-    active?: string; // Color for active districts
-    selected?: string; // Color for the selected district
-    stroke?: string; // Border color
-    selectedStroke?: string; // Border color for the selected district
-  };
+  /** Inline styles for the `<svg>`, merged over the default sizing. */
+  svgStyle?: React.CSSProperties;
 
-  /** Callback to debug unknown or misspelled district names */
+  /** Custom map colors. */
+  colors?: ManchitroColors;
+
+  /** Called whenever the set of recognized or unrecognized names in `items` changes. */
   onDebug?: (info: {
     unknownPlaces: string[];
-    activeDistricts: string[];
+    activeDistricts: ValidDistrict[];
   }) => void;
 
-  /** Render prop to customize the selected district overlay */
-  renderSelected?: (district: string) => React.ReactNode;
+  /**
+   * Replaces the default "Selected: X" label. Return `null` to hide it.
+   * @example renderSelected={() => null}
+   */
+  renderSelected?: (district: ValidDistrict) => React.ReactNode;
 
-  /** Render prop to customize the debug warning overlay */
+  /**
+   * Replaces the default "Unknown places" warning. Return `null` to hide it.
+   * @example renderDebug={() => null}
+   */
   renderDebug?: (unknownPlaces: string[]) => React.ReactNode;
 
-  /** Disables all map interactions */
+  /** Disables clicks, hover callbacks and keyboard selection. */
   disabled?: boolean;
 };
 
-/**
- * Normalizes strings by trimming, lowercasing, and removing special characters.
- * Example: "Cox's Bazar" -> "coxsbazar"
- */
-const normalize = (s: string) =>
-  (s || "")
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z]/g, "");
+const DISTRICT_ENTRIES = Object.entries(DISTRICT_PATH) as Array<
+  [string, { name: ValidDistrict; path: string }]
+>;
 
+const DEFAULT_SELECTED = "#22c55e";
+
+/**
+ * Interactive SVG map of the 64 districts of Bangladesh.
+ *
+ * @example
+ * <Manchitro
+ *   items={[{ place: "Dhaka" }, { place: "Sylhet" }]}
+ *   onSelect={(district) => console.log(district)}
+ * />
+ */
 function Manchitro({
   items,
   value,
@@ -152,150 +129,160 @@ function Manchitro({
   className,
   style,
   svgClassName,
+  svgStyle,
   colors,
   onDebug,
   renderSelected,
   renderDebug,
   disabled = false,
-}: ManchitroProps) {
-  // Merge user-provided colors with default colors
-  const mergedColors = React.useMemo(
-    () => ({
-      base: colors?.base ?? "#0f172a",
-      active: colors?.active ?? "#14532d",
-      selected: colors?.selected ?? "#22c55e",
-      stroke: colors?.stroke ?? "#334155",
-      selectedStroke: colors?.selectedStroke ?? "#ffffff",
-    }),
-    [colors],
+}: ManchitroProps): React.ReactElement {
+  const mergedColors = {
+    base: colors?.base ?? "#0f172a",
+    active: colors?.active ?? "#14532d",
+    selected: colors?.selected ?? DEFAULT_SELECTED,
+    stroke: colors?.stroke ?? "#334155",
+    selectedStroke: colors?.selectedStroke ?? "#ffffff",
+    selectedGlow:
+      colors?.selectedGlow ??
+      (colors?.selected
+        ? `color-mix(in srgb, ${colors.selected} 45%, transparent)`
+        : "rgba(34,197,94,0.45)"),
+  };
+
+  // Split items into recognized districts and unknown names
+  const resolved = (items ?? []).map((it) => {
+    const place = typeof it === "string" ? it : it?.place;
+    return { place: String(place ?? ""), district: resolveDistrict(place) };
+  });
+  const activeKey = resolved.map((r) => r.district ?? "").join("|");
+  const unknownKey = resolved
+    .map((r) => (r.district ? "" : r.place))
+    .join("|");
+
+  // Keyed on content (not array identity) so inline `items` arrays don't
+  // produce new results on every render.
+  const activeDistricts = React.useMemo(
+    () =>
+      Array.from(
+        new Set(resolved.flatMap((r) => (r.district ? [r.district] : []))),
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeKey],
+  );
+  const unknownPlaces = React.useMemo(
+    () =>
+      Array.from(
+        new Set(resolved.flatMap((r) => (r.district ? [] : [r.place]))),
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [unknownKey],
+  );
+  const activeSet = React.useMemo(
+    () => new Set<string>(activeDistricts),
+    [activeDistricts],
   );
 
-  // Create a lookup map for fast normalization matching
-  const districtNameLookup = React.useMemo(() => {
-    const map = new Map<string, string>();
-    for (const [, d] of Object.entries(DISTRICT_PATH)) {
-      map.set(normalize(d.name), d.name);
-    }
-    return map;
-  }, []);
-
-  // Separate active districts from unknown/misspelled ones
-  const { activeDistricts, unknownPlaces } = React.useMemo(() => {
-    const active: string[] = [];
-    const unknown: string[] = [];
-
-    for (const it of items || []) {
-      // Safely cast it to a primitive string for the logic checks
-      const placeName = it.place as string;
-
-      const canonical = districtNameLookup.get(normalize(placeName));
-      if (canonical) active.push(canonical);
-      else unknown.push(placeName);
-    }
-
-    return {
-      activeDistricts: Array.from(new Set(active)),
-      unknownPlaces: Array.from(new Set(unknown)),
-    };
-  }, [items, districtNameLookup]);
-
-  // Trigger debug callback if missing places are found
+  // Latest-ref so an inline `onDebug` doesn't re-fire the effect every render
+  const onDebugRef = React.useRef(onDebug);
+  onDebugRef.current = onDebug;
   React.useEffect(() => {
-    onDebug?.({ unknownPlaces, activeDistricts });
-  }, [unknownPlaces, activeDistricts, onDebug]);
+    onDebugRef.current?.({ unknownPlaces, activeDistricts });
+  }, [unknownPlaces, activeDistricts]);
 
-  // Handle local state for uncontrolled usage
-  const [inner, setInner] = React.useState<string | null>(defaultValue);
-  const selectedDistrict = value !== undefined ? value : inner;
+  const isControlled = value !== undefined;
+  const [inner, setInner] = React.useState<ValidDistrict | null>(() =>
+    resolveDistrict(defaultValue),
+  );
 
-  // Auto-select the first available district if none is selected
-  React.useEffect(() => {
-    if (!activeDistricts.length) {
-      if (value === undefined) setInner(null);
-      return;
-    }
-    if (!selectedDistrict || !activeDistricts.includes(selectedDistrict)) {
-      if (value === undefined) setInner(activeDistricts[0]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeDistricts.join("|")]);
+  // Uncontrolled: fall back to the first highlighted district when the
+  // current choice isn't highlighted. Derived during render so SSR output
+  // matches the first client render.
+  const selectedDistrict: ValidDistrict | null = isControlled
+    ? resolveDistrict(value)
+    : inner && activeSet.has(inner)
+      ? inner
+      : (activeDistricts[0] ?? null);
 
-  // Determine the fill color based on state
-  const getFill = (districtName: string) => {
-    const isSelected = selectedDistrict === districtName;
-    const hasItems = activeDistricts.includes(districtName);
-
-    if (isSelected) return mergedColors.selected;
-    if (hasItems) return mergedColors.active;
-    return mergedColors.base;
-  };
-
-  // Handle district click events
-  const onPick = (districtName: string) => {
-    if (disabled) return;
-    if (!activeDistricts.includes(districtName)) return;
-
-    if (value === undefined) setInner(districtName);
-    onSelect?.(districtName);
-  };
-
-  // Handle keyboard events for accessibility
-  const handleKeyDown = (e: React.KeyboardEvent, districtName: string) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      onPick(districtName);
-    }
+  const pick = (district: ValidDistrict) => {
+    if (disabled || !activeSet.has(district)) return;
+    if (!isControlled) setInner(district);
+    onSelect?.(district);
   };
 
   return (
     <div
-      className={
-        className ??
-        "relative w-full rounded-2xl border border-white/10 bg-black/40 backdrop-blur p-4"
-      }
-      style={
-        style ??
-        (className
+      className={className}
+      style={{
+        position: "relative",
+        ...(className
           ? undefined
           : {
-              position: "relative",
               background: "rgba(0,0,0,0.35)",
               border: "1px solid rgba(255,255,255,0.08)",
               borderRadius: 16,
-            })
-      }
+            }),
+        ...style,
+      }}
     >
       <svg
         viewBox={viewBox}
-        className={svgClassName ?? "w-full h-auto h-screen select-none"}
+        className={svgClassName}
+        style={{
+          ...(svgClassName
+            ? undefined
+            : { display: "block", width: "100%", height: "auto" }),
+          userSelect: "none",
+          ...svgStyle,
+        }}
         xmlns="http://www.w3.org/2000/svg"
-        role="img"
+        role="group"
         aria-label="Bangladesh district map"
       >
-        {Object.entries(DISTRICT_PATH).map(([key, d]) => {
-          const hasItems = activeDistricts.includes(d.name);
+        {DISTRICT_ENTRIES.map(([key, d]) => {
+          const hasItems = activeSet.has(d.name);
           const isSelected = selectedDistrict === d.name;
           const isInteractive = hasItems && !disabled;
 
           return (
             <g
               key={key}
-              onClick={() => onPick(d.name)}
-              onMouseEnter={(e) => onDistrictMouseEnter?.(d.name, e)}
-              onMouseLeave={(e) => onDistrictMouseLeave?.(d.name, e)}
-              onKeyDown={(e) => isInteractive && handleKeyDown(e, d.name)}
+              onClick={isInteractive ? () => pick(d.name) : undefined}
+              onMouseEnter={
+                isInteractive
+                  ? (e) => onDistrictMouseEnter?.(d.name, e)
+                  : undefined
+              }
+              onMouseLeave={
+                isInteractive
+                  ? (e) => onDistrictMouseLeave?.(d.name, e)
+                  : undefined
+              }
+              onKeyDown={
+                isInteractive
+                  ? (e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        pick(d.name);
+                      }
+                    }
+                  : undefined
+              }
               role={isInteractive ? "button" : "img"}
               aria-label={d.name}
+              aria-pressed={isInteractive ? isSelected : undefined}
               tabIndex={isInteractive ? 0 : undefined}
-              style={{
-                cursor: isInteractive ? "pointer" : "default",
-                outline: "none",
-              }}
+              style={{ cursor: isInteractive ? "pointer" : "default" }}
             >
               <title>{d.name}</title>
               <path
                 d={d.path}
-                fill={getFill(d.name)}
+                fill={
+                  isSelected
+                    ? mergedColors.selected
+                    : hasItems
+                      ? mergedColors.active
+                      : mergedColors.base
+                }
                 stroke={
                   isSelected ? mergedColors.selectedStroke : mergedColors.stroke
                 }
@@ -304,7 +291,7 @@ function Manchitro({
                 style={{
                   transition: "all 200ms ease",
                   filter: isSelected
-                    ? "drop-shadow(0px 0px 10px rgba(34,197,94,0.45))"
+                    ? `drop-shadow(0px 0px 10px ${mergedColors.selectedGlow})`
                     : "none",
                 }}
               />
@@ -313,7 +300,7 @@ function Manchitro({
         })}
       </svg>
 
-      {/* Selected District Overlay */}
+      {/* Selected district overlay */}
       {selectedDistrict &&
         (renderSelected ? (
           renderSelected(selectedDistrict)
@@ -333,7 +320,7 @@ function Manchitro({
           </div>
         ))}
 
-      {/* Unknown Places Warning Overlay */}
+      {/* Unknown places warning overlay */}
       {unknownPlaces.length > 0 &&
         (renderDebug ? (
           renderDebug(unknownPlaces)

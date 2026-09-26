@@ -1,37 +1,62 @@
 {
   "name": "manchitro",
-  "version": "2.0.1",
+  "version": "2.1.0",
+  "description": "Interactive, typed SVG map of all 64 Bangladesh districts as a React component. Highlight districts, handle clicks and hovers, and customize colors. Works with Next.js (App Router), Vite, Remix and TanStack Start.",
   "type": "module",
-  "description": "Interactive Bangladesh district SVG map for React, Next.js and TanStack.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
-    "dist"
+    "dist",
+    "llms.txt"
   ],
+  "sideEffects": false,
   "scripts": {
     "build": "rollup -c",
-    "prepublishOnly": "npm run build"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint:package": "publint && attw --pack .",
+    "check": "npm run typecheck && npm test && npm run build && npm run lint:package",
+    "prepublishOnly": "npm run check"
   },
   "keywords": [
     "bangladesh",
-    "district-map",
+    "bangladesh-map",
     "bangladesh-district-map",
-    "map",
+    "bangladesh-districts",
+    "bd-map",
     "district-map",
+    "zila",
+    "react",
+    "react-component",
     "react-map",
+    "nextjs",
     "svg-map",
     "interactive-map",
-    "bangladesh-map",
-    "bangladesh-map-react",
-    "bangladesh-map-components",
-    "map-components",
-    "css-map",
+    "typescript",
     "tailwind-map"
   ],
   "author": "MD TOFAAL AHMED (https://github.com/tofaal9152)",
+  "homepage": "https://github.com/tofaal9152/manchitro#readme",
+  "bugs": {
+    "url": "https://github.com/tofaal9152/manchitro/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tofaal9152/manchitro"
+    "url": "git+https://github.com/tofaal9152/manchitro.git"
   },
   "license": "MIT",
   "peerDependencies": {
@@ -39,10 +64,20 @@
     "react-dom": ">=18"
   },
   "devDependencies": {
-    "@rollup/plugin-babel": "^6.0.4",
-    "@rollup/plugin-typescript": "^11.1.6",
-    "@types/react": "^18.2.58",
-    "rollup": "^4.12.0",
-    "tslib": "^2.6.2"
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "jsdom": "^30.1.1",
+    "publint": "^0.3.24",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "rollup": "^4.63.5",
+    "rollup-plugin-dts": "^6.5.1",
+    "tslib": "^2.8.1",
+    "typescript": "~5.9.3",
+    "vitest": "^5.0.2"
   }
 }

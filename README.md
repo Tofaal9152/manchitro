@@ -1,14 +1,17 @@
-﻿# React Bangladesh District Map
+# Manchitro: Bangladesh District Map for React
 
-A highly customizable, interactive, and accessible SVG map of Bangladesh districts for React applications. Built with flexibility in mind, allowing developers to easily integrate, style, and extend its functionality.
+An interactive, accessible and fully typed SVG map of all **64 districts of Bangladesh** as a single React component. Highlight districts from your data, handle clicks and hovers, and style it with your own colors or Tailwind classes.
+
+Works with **Next.js (App Router and Pages Router)**, **Vite**, **Remix / React Router**, **TanStack Start** and plain React 18 or 19. No runtime dependencies.
+
 <div align="center">
   <table>
     <tr>
       <td>
-        <img src="https://i.ibb.co.com/v4KtY2vq/photo-1-2026-04-18-12-48-43.jpg" alt="Manchitro Banner 1" width="400" />
+        <img src="https://i.ibb.co.com/v4KtY2vq/photo-1-2026-04-18-12-48-43.jpg" alt="Manchitro dark map with highlighted districts" width="400" />
       </td>
       <td>
-        <img src="https://i.ibb.co.com/MDSYzq1H/photo-2-2026-04-18-12-48-43.jpg" alt="Manchitro Banner 2" width="400" h />
+        <img src="https://i.ibb.co.com/MDSYzq1H/photo-2-2026-04-18-12-48-43.jpg" alt="Manchitro map with a selected district" width="400" />
       </td>
     </tr>
   </table>
@@ -16,177 +19,243 @@ A highly customizable, interactive, and accessible SVG map of Bangladesh distric
 
 ## Features
 
-- **TypeScript Auto-Complete:** Full IntelliSense support. VS Code will automatically suggest the correct names for all 64 districts while typing.
-- **Fully Customizable:** Change colors, borders, and CSS classes (Tailwind compatible).
-- **Render Props:** Completely override the default UI overlays with your own React components.
-- **Interactive:** Hover events, click events, and fully accessible keyboard navigation (`Tab` + `Enter`/`Space`).
-- **Flexible Dimensions:** Adjustable `viewBox` for custom cropping and zooming.
+- **Typed district names:** Editor autocomplete for all 64 districts; `onSelect` gives you a typed `ValidDistrict`.
+- **Forgiving input:** Case, spaces and punctuation are ignored, and common spellings are accepted (`"Chattogram"`, `"Cumilla"`, `"Barishal"`, `"Bogura"`, `"Jashore"`, `"cox's bazar"`, `"Dhaka District"`).
+- **Controlled or uncontrolled** selection.
+- **Accessible:** Highlighted districts are keyboard focusable buttons (`Tab`, then `Enter`/`Space`).
+- **Customizable:** Colors, class names, inline styles, render props for the overlays, and `viewBox` cropping.
+- **Server rendering ready:** Ships with `"use client"`, so you can import it straight into a Next.js Server Component.
+- **ESM + CommonJS** builds with correct types for every TypeScript `moduleResolution` mode.
 
 ## Installation
-
-Install the package via your preferred package manager:
 
 ```bash
 npm install manchitro
 # or
-yarn add manchitro
-# or
 pnpm add manchitro
+# or
+yarn add manchitro
 ```
 
----
+Peer dependencies: `react` and `react-dom` 18 or newer.
 
 ## Quick Start
 
-Here is a minimal example to get the map rendering in your app.
-
 ```tsx
-import React, { useState } from "react";
 import { Manchitro } from "manchitro";
 
-const myData = [
-  { id: "1", place: "Dhaka" },
-  { id: "2", place: "Rajshahi" },
-  { id: "3", place: "Sylhet" },
+export default function Page() {
+  return <Manchitro items={[{ place: "Dhaka" }, { place: "Sylhet" }]} />;
+}
+```
+
+This works as-is in a Next.js App Router page (a Server Component). You don't need to add `"use client"` yourself.
+
+### Handling selection (controlled)
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { Manchitro, type ValidDistrict } from "manchitro";
+
+const offices = [
+  { id: 1, place: "Dhaka" },
+  { id: 2, place: "Chattogram" },
+  { id: 3, place: "Sylhet" },
 ];
 
-export default function App() {
-  const [selected, setSelected] = useState<string | null>("Dhaka");
+export function OfficeMap() {
+  const [selected, setSelected] = useState<ValidDistrict | null>("Dhaka");
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <Manchitro
-        items={myData}
-        value={selected}
-        onSelect={(district) => setSelected(district)}
-      />
-    </div>
+    <Manchitro items={offices} value={selected} onSelect={setSelected} />
   );
 }
 ```
 
----
+`onSelect` always receives the **canonical** name (e.g. `"Chattogram"` in your data comes back as `"Chittagong"`). Use `resolveDistrict` to match it back to your own records:
 
-## Supported Districts
+```ts
+import { resolveDistrict } from "manchitro";
 
-This package fully supports all **64 districts** of Bangladesh. When passing data to the map, use the exact spelling (or any capitalization without spaces) of the districts below:
+const office = offices.find((o) => resolveDistrict(o.place) === selected);
+```
 
-**Dhaka Division:** Dhaka, Gazipur, Kishoreganj, Manikganj, Munshiganj, Narayanganj, Narsingdi, Tangail, Faridpur, Gopalganj, Madaripur, Rajbari, Shariatpur.
+## The `items` prop
 
-**Chittagong Division:** Brahmanbaria, Comilla, Chandpur, Lakshmipur, Noakhali, Feni, Khagrachari, Rangamati, Bandarban, Chittagong, Cox's Bazar.
+`items` controls which districts are highlighted and clickable. Each entry can be:
 
-**Rajshahi Division:** Bogra, Joypurhat, Naogaon, Natore, Chapai Nawabganj, Pabna, Rajshahi, Sirajganj.
+- an object with a `place` field: `{ place: "Dhaka" }`. `id` is optional, and any extra fields (counts, labels, …) are allowed and ignored.
+- a plain string: `"Dhaka"`.
 
-**Khulna Division:** Bagerhat, Chuadanga, Jessore, Jhenaidah, Khulna, Kushtia, Magura, Meherpur, Narail, Satkhira.
+```tsx
+<Manchitro items={["Dhaka", { id: 7, place: "Khulna", total: 12 }]} />
+```
 
-**Barisal Division:** Barguna, Barisal, Bhola, Jhalokati, Patuakhali, Pirojpur.
+Names that can't be matched are shown in a small warning in the top-right corner and reported through `onDebug`.
 
-**Sylhet Division:** Habiganj, Moulvibazar, Sunamganj, Sylhet.
+## District names
 
-**Rangpur Division:** Dinajpur, Gaibandha, Kurigram, Lalmonirhat, Nilphamari, Panchagarh, Rangpur, Thakurgaon.
+`onSelect`, `renderSelected` and `onDebug` always use these 64 canonical names (also exported as `DISTRICTS`):
 
-**Mymensingh Division:** Jamalpur, Mymensingh, Netrokona, Sherpur.
+| Division   | Districts                                                                                                                                      |
+| :--------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dhaka      | Dhaka, Faridpur, Gazipur, Gopalganj, Kishoreganj, Madaripur, Manikganj, Munshiganj, Narayanganj, Narshingdi, Rajbari, Shariatpur, Tangail |
+| Chittagong | Bandarban, Brahmanbaria, Chandpur, Chittagong, Comilla, Cox's Bazar, Feni, Khagrachari, Lakshmipur, Noakhali, Rangamati                    |
+| Rajshahi   | Bogra, Chapai Nawabganj, Jaipurhat, Naogaon, Natore, Pabna, Rajshahi, Sirajganj                                                             |
+| Khulna     | Bagerhat, Chuadanga, Jessore, Jhinaidaha, Khulna, Kushtia, Magura, Meherpur, Narail, Satkhira                                               |
+| Barisal    | Barisal, Bhola, Borguna, Jhalokati, Patuakhali, Pirojpur                                                                                    |
+| Sylhet     | Habiganj, Maulvibazar, Sunamganj, Sylhet                                                                                                    |
+| Rangpur    | Dinajpur, Gaibandha, Kurigram, Lalmonirhat, Nilfamari, Panchagarh, Rangpur, Thakurgaon                                                      |
+| Mymensingh | Jamalpur, Mymensingh, Netrokona, Sherpur                                                                                                    |
 
----
+Matching ignores case, spaces, punctuation and a trailing "District"/"Zila". These alternate spellings are also accepted:
 
-## Advanced Customization
+| You can pass                                | Resolves to      |
+| :------------------------------------------ | :--------------- |
+| Chattogram, Chottogram                      | Chittagong       |
+| Cumilla, Kumilla                            | Comilla          |
+| Barishal                                    | Barisal          |
+| Barguna                                     | Borguna          |
+| Bogura                                      | Bogra            |
+| Jashore                                     | Jessore          |
+| Joypurhat, Jaypurhat                        | Jaipurhat        |
+| Jhenaidah, Jhenidah                         | Jhinaidaha       |
+| Jhalakathi, Jhalakati, Jhalokathi           | Jhalokati        |
+| Moulvibazar, Moulavibazar                   | Maulvibazar      |
+| Narsingdi, Narsinghdi                       | Narshingdi       |
+| Netrakona                                   | Netrokona        |
+| Nilphamari                                  | Nilfamari        |
+| Khagrachhari                                | Khagrachari      |
+| Kishorganj                                  | Kishoreganj      |
+| Laxmipur                                    | Lakshmipur       |
+| Chapainawabganj, Nawabganj, Chapai          | Chapai Nawabganj |
+| Cox Bazar                                   | Cox's Bazar      |
+| Any "-gonj" spelling (Munshigonj, Sirajgonj) | "-ganj" form     |
 
-### 1. Custom Colors & Styling
+## Customization
 
-You can match the map perfectly to your brand by overriding the `colors` prop and passing custom classes.
+### Colors and styling
 
 ```tsx
 <Manchitro
   items={myData}
-  className="relative w-full rounded-xl bg-slate-50 border border-slate-200 p-4"
+  className="w-full rounded-xl border border-slate-200 bg-slate-50 p-4"
   colors={{
-    base: "#e2e8f0", // Default color for empty districts
-    active: "#3b82f6", // Color for districts in your 'items' list
-    selected: "#ef4444", // Color when a district is selected
-    stroke: "#ffffff", // Border line color
-    selectedStroke: "#000", // Border color of the selected district
+    base: "#e2e8f0", // districts not in items
+    active: "#3b82f6", // districts in items
+    selected: "#ef4444", // the selected district
+    stroke: "#ffffff", // district borders
+    selectedStroke: "#000000", // border of the selected district
+    // selectedGlow: "rgba(239,68,68,0.4)", // optional, defaults to a translucent `selected`
   }}
 />
 ```
 
-### 2. Custom Overlays (Render Props)
+- Without `className`, the container gets a default dark background, border and radius. Passing `className` replaces them with your classes. The container always keeps `position: relative` so the overlays stay inside it.
+- Without `svgClassName`, the SVG gets `width: 100%; height: auto`. Use `svgStyle` (e.g. `{ maxHeight: 600 }`) or `svgClassName` to size it.
 
-Don't like the default text overlays? Build your own using `renderSelected` and `renderDebug`.
+### Custom or hidden overlays
 
 ```tsx
 <Manchitro
   items={myData}
   renderSelected={(district) => (
-    <div className="absolute top-4 left-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md font-medium">
-      Active Region: {district}
+    <div className="absolute left-4 top-4 rounded-lg bg-blue-600 px-4 py-2 text-white">
+      {district}
     </div>
   )}
+  renderDebug={() => null} // hide the unknown-names warning
 />
 ```
 
-### 3. Tooltips & Hover Events
+### Tooltips and hover
 
-Use the `onDistrictMouseEnter` and `onDistrictMouseLeave` events to integrate your own custom tooltips (like Radix UI, Tippy.js, or Floating UI).
+`onDistrictMouseEnter` and `onDistrictMouseLeave` fire for highlighted districts:
 
 ```tsx
-<Manchitro
-  items={myData}
-  onDistrictMouseEnter={(district, event) => {
-    console.log(
-      `Mouse entered ${district} at X: ${event.clientX}, Y: ${event.clientY}`,
-    );
-  }}
-/>
+"use client";
+
+import { useState } from "react";
+import { Manchitro, type ValidDistrict } from "manchitro";
+
+export function MapWithTooltip() {
+  const [hover, setHover] = useState<{ name: ValidDistrict; x: number; y: number } | null>(null);
+
+  return (
+    <div style={{ position: "relative" }}>
+      <Manchitro
+        items={["Dhaka", "Khulna", "Rajshahi"]}
+        onDistrictMouseEnter={(name, e) => setHover({ name, x: e.clientX, y: e.clientY })}
+        onDistrictMouseLeave={() => setHover(null)}
+      />
+      {hover && (
+        <div style={{ position: "fixed", left: hover.x + 12, top: hover.y + 12 }}>
+          {hover.name}
+        </div>
+      )}
+    </div>
+  );
+}
 ```
 
-### 4. Custom Zoom / ViewBox
-
-Need to focus on a specific part of the map or change the aspect ratio? Use the `viewBox` prop.
+### Cropping or zooming
 
 ```tsx
-<Manchitro
-  items={myData}
-  viewBox="200 200 1000 1500" // Custom crop
-/>
+<Manchitro items={myData} viewBox="200 200 1000 1500" />
 ```
 
----
+## API
 
-## API Reference (Props)
+### `<Manchitro />` props
 
-| Prop                   | Type                                        | Default                | Description                                                                                                                                |
-| :--------------------- | :------------------------------------------ | :--------------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
-| `items`                | `DistrictItem[]`                            | `[]`                   | **Required.** Array of objects `{ id: string, place: string }` representing active districts. Provides IDE auto-complete for 64 districts. |
-| `value`                | `string \| null`                            | `undefined`            | The currently selected district (Controlled mode).                                                                                         |
-| `defaultValue`         | `string \| null`                            | `null`                 | The district selected by default on first render (Uncontrolled mode).                                                                      |
-| `onSelect`             | `(district: string) => void`                | `undefined`            | Callback fired when an active district is clicked or selected via keyboard.                                                                |
-| `colors`               | `Object`                                    | `{...}`                | Override map colors: `base`, `active`, `selected`, `stroke`, `selectedStroke`.                                                             |
-| `className`            | `string`                                    | `"relative w-full..."` | Tailwind or CSS classes for the main container wrapper.                                                                                    |
-| `style`                | `React.CSSProperties`                       | `{}`                   | Standard React inline styles for the main container wrapper.                                                                               |
-| `svgClassName`         | `string`                                    | `"w-full h-auto..."`   | CSS classes applied directly to the `<svg>` element.                                                                                       |
-| `viewBox`              | `string`                                    | `"0 0 1555 2140"`      | Adjusts the SVG viewBox for zooming or cropping.                                                                                           |
-| `renderSelected`       | `(district: string) => ReactNode`           | `undefined`            | Render prop to completely replace the "Selected" UI overlay.                                                                               |
-| `renderDebug`          | `(unknown: string[]) => ReactNode`          | `undefined`            | Render prop to completely replace the "Unknown places" UI overlay.                                                                         |
-| `onDistrictMouseEnter` | `(district: string, e: MouseEvent) => void` | `undefined`            | Callback fired when the mouse hovers over an active district.                                                                              |
-| `onDistrictMouseLeave` | `(district: string, e: MouseEvent) => void` | `undefined`            | Callback fired when the mouse leaves an active district.                                                                                   |
-| `onDebug`              | `(info: object) => void`                    | `undefined`            | Returns `{ activeDistricts, unknownPlaces }` arrays for debugging missing data.                                                            |
-| `disabled`             | `boolean`                                   | `false`                | If `true`, disables all interactions (clicks, hovers, keyboard).                                                                           |
+All props are optional.
 
----
+| Prop                   | Type                                                  | Default           | Description                                                                                     |
+| :--------------------- | :---------------------------------------------------- | :---------------- | :---------------------------------------------------------------------------------------------- |
+| `items`                | `Array<{ place: string; id?: string \| number } \| string>` | `[]`         | Districts to highlight and make clickable.                                                      |
+| `value`                | `string \| null`                                      | —                 | Selected district (controlled). Any accepted spelling; `null` for no selection.                 |
+| `defaultValue`         | `string \| null`                                      | first of `items`  | Initial selection (uncontrolled). Falls back to the first item if not in `items`.               |
+| `onSelect`             | `(district: ValidDistrict) => void`                   | —                 | Highlighted district clicked or activated with the keyboard.                                    |
+| `onDistrictMouseEnter` | `(district: ValidDistrict, e: React.MouseEvent) => void` | —              | Pointer entered a highlighted district.                                                         |
+| `onDistrictMouseLeave` | `(district: ValidDistrict, e: React.MouseEvent) => void` | —              | Pointer left a highlighted district.                                                            |
+| `colors`               | `ManchitroColors`                                     | dark green theme  | `base`, `active`, `selected`, `stroke`, `selectedStroke`, `selectedGlow`.                       |
+| `className`            | `string`                                              | —                 | Classes for the container. Replaces the default background/border.                              |
+| `style`                | `React.CSSProperties`                                 | —                 | Inline styles for the container.                                                                |
+| `svgClassName`         | `string`                                              | —                 | Classes for the `<svg>`. Replaces the default `width: 100%; height: auto`.                      |
+| `svgStyle`             | `React.CSSProperties`                                 | —                 | Inline styles for the `<svg>`.                                                                  |
+| `viewBox`              | `string`                                              | `"0 0 1555 2140"` | SVG viewBox for cropping or zooming.                                                            |
+| `renderSelected`       | `(district: ValidDistrict) => ReactNode`              | —                 | Replaces the "Selected: X" label. Return `null` to hide it.                                     |
+| `renderDebug`          | `(unknownPlaces: string[]) => ReactNode`              | —                 | Replaces the "Unknown places" warning. Return `null` to hide it.                                |
+| `onDebug`              | `(info: { unknownPlaces: string[]; activeDistricts: ValidDistrict[] }) => void` | — | Called when the recognized or unrecognized names change.                            |
+| `disabled`             | `boolean`                                             | `false`           | Disables clicks, hover callbacks and keyboard selection.                                        |
+
+### Other exports
+
+| Export                  | Description                                                                 |
+| :---------------------- | :-------------------------------------------------------------------------- |
+| `DISTRICTS`             | Readonly array of the 64 canonical district names.                          |
+| `resolveDistrict(name)` | Returns the canonical name for any accepted spelling, or `null`.            |
+| `isDistrict(name)`      | `true` if `name` is a recognizable district.                                |
+| `ValidDistrict`         | Type: union of the 64 canonical names.                                      |
+| `DistrictInput`         | Type: accepted input name (autocompletes canonical names, allows any string). |
+| `DistrictItem`          | Type: an object entry in `items`.                                           |
+| `ManchitroProps`, `ManchitroColors` | Types for the component props and colors.                       |
 
 ## Debugging
 
-If you pass a list of items but some districts aren't lighting up, they might be misspelled. The map will automatically display a small warning in the top right corner with the unrecognized names.
-
-You can also programmatically track these using the `onDebug` prop:
+If a district doesn't light up, its name wasn't recognized. The map shows the unknown names in the top-right corner, and you can log them:
 
 ```tsx
 <Manchitro
   items={myData}
   onDebug={({ unknownPlaces }) => {
-    if (unknownPlaces.length > 0) {
-      console.warn("These districts were not found:", unknownPlaces);
-    }
+    if (unknownPlaces.length) console.warn("Unknown districts:", unknownPlaces);
   }}
 />
 ```
+
+## License
+
+MIT
